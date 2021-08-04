@@ -60,6 +60,8 @@ provider:
 #    - include-me-dir/**
 
 functions:
+  testFunction:
+    handler: src/functions/testFunction.testFunction
   hello:
     handler: handler.hello
 #    The following are a few example events you can configure
@@ -117,3 +119,7 @@ functions:
 plugins:
   - serverless-pseudo-parameters
   - serverless-mocha
+custom:
+  serverless-mocha-plugin:
+    testTemplate: templates/test-template.ejs
+    functionTemplate: templates/function-template.ejs
