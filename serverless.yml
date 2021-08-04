@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: coursetemplate
+service: service-template
 # app and org for use with dashboard.serverless.com
 #app: your-app-name
 #org: your-org-name
@@ -23,6 +23,8 @@ frameworkVersion: '2'
 provider:
   name: aws
   runtime: nodejs12.x
+  stage: ${opt:stage, 'dev'}
+  region: us-east-1
   lambdaHashingVersion: 20201221
 
 # you can overwrite defaults here
