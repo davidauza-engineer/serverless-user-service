@@ -5,6 +5,7 @@
   "dependencies": {},
   "devDependencies": {
     "serverless": "^2.53.0",
+    "serverless-mocha": "^1.12.0",
     "serverless-pseudo-parameters": "^2.6.0"
   }
 }
