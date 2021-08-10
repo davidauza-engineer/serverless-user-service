@@ -11,10 +11,10 @@
 #
 # Happy Coding!
 
-service: service-template
+service: user-service
 # app and org for use with dashboard.serverless.com
-#app: your-app-name
-#org: your-org-name
+app: myapp
+org: davidauzaengineer
 
 # You can pin your service to only deploy with a specific Serverless version
 # Check out our docs for more details
@@ -32,6 +32,14 @@ provider:
 #  region: us-east-1
 
 # you can add statements to the Lambda function's IAM Role here
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - "dynamodb:Query"
+        - "dynamodb:PutItem"
+      Resource:
+        - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.dynamodb.userTable}
+        - arn:aws:dynamodb:#{AWS::Region}:#{AWS::AccountId}:table/${self:custom.dynamodb.userTable}/index/pk
 #  iamRoleStatements:
 #    - Effect: "Allow"
 #      Action:
@@ -48,8 +56,8 @@ provider:
 #            - "/*"
 
 # you can define service wide environment variables here
-#  environment:
-#    variable1: value1
+  environment:
+    DYNAMODB_USER_TABLE: ${self:custom.dynamodb.userTable}
 
 # you can add packaging information here
 #package:
@@ -60,10 +68,17 @@ provider:
 #    - include-me-dir/**
 
 functions:
-  testFunction:
-    handler: src/functions/testFunction.testFunction
-  hello:
-    handler: handler.hello
+  createUser:
+    handler: src/functions/createUser.createUser
+    events:
+      - http:
+          method: post
+          cors: true
+          path: /v1/user
+          request:
+            schema:
+              application/json: ${file(src/schema/create_user_request.json)}
+
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
@@ -120,6 +135,22 @@ plugins:
   - serverless-pseudo-parameters
   - serverless-mocha
 custom:
+  dynamodb:
+    userTable: ${self:service}-user-${self:provider.stage}
   serverless-mocha-plugin:
     testTemplate: templates/test-template.ejs
     functionTemplate: templates/function-template.ejs
+  resources:
+    Resources:
+      userTable:
+        Type: AWS::DynamoDB::Table
+        DeletionPolicy: Retain
+        Properties:
+          TableName: ${self:custom.dynamodb.userTable}
+          AttributeDefinitions:
+            - AttributeName: pk
+              AttributeType: S
+          KeySchema:
+            - AttributeName: pk
+              keyType: HASH
+          BillingMode: PAY_PER_REQUEST{}
