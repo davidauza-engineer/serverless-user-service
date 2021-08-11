@@ -69,6 +69,8 @@ provider:
 #    - include-me-dir/**
 
 functions:
+  validate:
+    handler: src/functions/validate.validate
   loginUser:
     handler: src/functions/login.login
     events:
@@ -89,6 +91,14 @@ functions:
           request:
             schema:
               application/json: ${file(src/schema/create_user_request.json)}
+  updateUser:
+    handler: src/functions/updateUser.updateUser
+    events:
+      - http:
+          method: put
+          cors: true
+          path: /v1/user
+          authorizer: validate
 
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
