@@ -58,6 +58,7 @@ provider:
 # you can define service wide environment variables here
   environment:
     DYNAMODB_USER_TABLE: ${self:custom.dynamodb.userTable}
+    JWT_SECRET: ${param:JWT_SECRET}
 
 # you can add packaging information here
 #package:
@@ -68,6 +69,16 @@ provider:
 #    - include-me-dir/**
 
 functions:
+  loginUser:
+    handler: src/functions/login.login
+    events:
+      - http:
+          method: post
+          cors: true
+          path: /v1/user/login
+          request:
+            schema:
+              application/json: ${file(src/schema/login_request.json)}
   createUser:
     handler: src/functions/createUser.createUser
     events:
